@@ -330,6 +330,36 @@ button{cursor:pointer}
     <button id="theme-btn-navy"        onclick="applyTheme('navy');closeSettingsMenu()"        style="padding:8px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-family:var(--fm);font-size:9px;cursor:pointer;transition:all 0.15s;text-align:center">Navy</button>
   </div>
   <div style="height:1px;background:var(--border);margin:4px 0"></div>
+  <div style="font-family:var(--fm);font-size:8px;color:var(--t1);letter-spacing:2px;padding:6px 10px 6px;font-weight:600">⚡ FONCTIONNALITÉS</div>
+  <div onclick="togglePropFirm()" style="width:100%;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-radius:7px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+    <span style="font-family:var(--fm);font-size:11px;color:var(--t1)">🏆 Mode Prop Firm</span>
+    <div id="toggle-propfirm" style="width:36px;height:20px;border-radius:10px;background:var(--bg4);border:1px solid var(--border);position:relative;transition:all 0.2s">
+      <div id="toggle-propfirm-dot" style="position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:var(--t3);transition:all 0.2s"></div>
+    </div>
+  </div>
+  <div id="propfirm-config" style="display:none;margin:0 4px 8px;background:var(--bg3);border:1px solid var(--border-accent);border-radius:10px;padding:12px">
+    <div style="font-family:var(--fm);font-size:8px;color:var(--accent);letter-spacing:2px;margin-bottom:10px;font-weight:600">CONFIG DU CHALLENGE</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div>
+        <div style="font-family:var(--fm);font-size:8px;color:var(--t2);margin-bottom:4px;letter-spacing:1px">TAILLE COMPTE ($)</div>
+        <input id="pf-account-size" type="number" placeholder="10000" oninput="savePropFirmConfig()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--t1);font-family:var(--fm);font-size:11px;outline:none;box-sizing:border-box"/>
+      </div>
+      <div>
+        <div style="font-family:var(--fm);font-size:8px;color:var(--accent);margin-bottom:4px;letter-spacing:1px">OBJECTIF PROFIT (%)</div>
+        <input id="pf-profit-target" type="number" placeholder="10" oninput="savePropFirmConfig()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--t1);font-family:var(--fm);font-size:11px;outline:none;box-sizing:border-box"/>
+      </div>
+      <div>
+        <div style="font-family:var(--fm);font-size:8px;color:var(--red);margin-bottom:4px;letter-spacing:1px">PERTE MAX JOUR (%)</div>
+        <input id="pf-daily-loss" type="number" placeholder="5" oninput="savePropFirmConfig()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--t1);font-family:var(--fm);font-size:11px;outline:none;box-sizing:border-box"/>
+      </div>
+      <div>
+        <div style="font-family:var(--fm);font-size:8px;color:var(--red);margin-bottom:4px;letter-spacing:1px">PERTE MAX TOTALE (%)</div>
+        <input id="pf-max-loss" type="number" placeholder="10" oninput="savePropFirmConfig()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--t1);font-family:var(--fm);font-size:11px;outline:none;box-sizing:border-box"/>
+      </div>
+    </div>
+    <div id="pf-indicators" style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>
+  </div>
+  <div style="height:1px;background:var(--border);margin:4px 0"></div>
   <button onclick="showOnboardingAgain();closeSettingsMenu()" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--t1);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">📖 Revoir le tutoriel</button>
   <button onclick="if(confirm('Supprimer toutes les données ?')){localStorage.clear();location.reload()}" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--red);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px" onmouseover="this.style.background='var(--red-dim)'" onmouseout="this.style.background='transparent'">🗑 Réinitialiser tout</button>
   <div style="font-family:var(--fm);font-size:7px;color:var(--t3);text-align:center;padding:6px 0 2px">v0.5.0 BETA</div>
@@ -427,6 +457,7 @@ const DAYS_FR = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const DAYS_LONG = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 const SESSION_COLORS = ['#00ff88','rgba(59,130,246,0.85)','rgba(245,197,66,0.85)','rgba(255,59,92,0.7)'];
 const PROP_RULES = {maxDD:10};
+function isPropFirmMode(){ return !!state.propFirmMode; }
 const PERIODS = [{l:'7J',d:7},{l:'30J',d:30},{l:'3M',d:90},{l:'6M',d:180},{l:'1A',d:365},{l:'TOUT',d:0}];
 
 let state = {
@@ -1029,7 +1060,7 @@ function renderKPIs(stats, color){
     ${[
       {l:'P&L Net',v:(stats.totalPnl>=0?'+$':'-$')+Math.abs(stats.totalPnl).toFixed(0),c:stats.totalPnl>=0?color:'var(--red)',s:`${stats.wins.length}W / ${stats.losses.length}L`,i:'💰'},
       {l:'Win Rate',v:stats.winRate.toFixed(1)+'%',c:stats.winRate>=50?color:'var(--red)',s:`<div class="wr-bar"><div class="wr-fill" style="width:${stats.winRate}%;background:${stats.winRate>=50?color:'var(--red)'}"></div></div>`,i:'🎯'},
-      {l:'Max Drawdown',v:'-'+stats.maxDD.toFixed(2)+'%',c:stats.maxDD>PROP_RULES.maxDD?'var(--red)':stats.maxDD>PROP_RULES.maxDD*0.8?'var(--gold)':color,s:stats.maxDD>PROP_RULES.maxDD?'⛔ Limite':stats.maxDD>PROP_RULES.maxDD*0.8?'⚠ Proche':'✓ OK',i:'📉'},
+      {l:'Max Drawdown',v:'-'+stats.maxDD.toFixed(2)+'%',c:isPropFirmMode()?(stats.maxDD>PROP_RULES.maxDD?'var(--red)':stats.maxDD>PROP_RULES.maxDD*0.8?'var(--gold)':color):color,s:isPropFirmMode()?(stats.maxDD>PROP_RULES.maxDD?'⛔ Limite':stats.maxDD>PROP_RULES.maxDD*0.8?'⚠ Proche':'✓ OK'):'',i:'📉'},
       {l:'Ratio R:R',v:stats.rr.toFixed(2),c:stats.rr>=1.5?color:stats.rr>=1?'var(--t1)':'var(--red)',s:`PF: ${stats.pf.toFixed(2)}`,i:'⚖️'},
       {l:'Meilleur Trade',v:'+$'+stats.best.pnl.toFixed(0),c:color,s:stats.best.instrument,i:'📈'},
       {l:'Streak Max',v:stats.maxStreak+'W',c:color,s:'Wins consécutifs',i:'🔥'},
@@ -1115,7 +1146,7 @@ function renderCharts(trades, color){
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Drawdown</div></div>
       <div class="chart-wrap" style="position:relative">
-        <div style="position:absolute;top:14px;right:14px;font-family:var(--fm);font-size:9px;color:rgba(255,59,92,0.6)">limite: -${PROP_RULES.maxDD}%</div>
+        ${isPropFirmMode()?'<div style="position:absolute;top:14px;right:14px;font-family:var(--fm);font-size:9px;color:rgba(255,59,92,0.6)">limite: -'+PROP_RULES.maxDD+'%</div>':''}
         <canvas id="chart-dd" height="150"></canvas>
       </div>
     </div>
@@ -1283,6 +1314,7 @@ function renderPeriodBar(color){
 function setPeriod(d){state.period=d;renderContent();}
 
 function renderAlert(trades){
+  if(!isPropFirmMode()) return '';
   if(!trades.length) return '';
   const minEq=Math.min(...trades.map(t=>t.equity));
   const base=minEq<0?Math.abs(minEq)+100:100;
@@ -1576,6 +1608,7 @@ document.addEventListener('click', e=>{
 function showSettingsMenu(){
   const m=document.getElementById('settings-menu');
   m.style.display=m.style.display==='none'?'block':'none';
+  updatePropFirmToggle();
 }
 function closeSettingsMenu(){
   const m=document.getElementById('settings-menu');
@@ -1621,6 +1654,88 @@ function applyTheme(name){
 (function(){ applyTheme(localStorage.getItem('edge_theme')||'tradingview'); })();
 function showOnboardingAgain(){
   showOnboarding();
+}
+
+function togglePropFirm(){
+  state.propFirmMode = !state.propFirmMode;
+  saveState();
+  updatePropFirmToggle();
+  renderAll();
+}
+
+function updatePropFirmToggle(){
+  const track = document.getElementById('toggle-propfirm');
+  const dot   = document.getElementById('toggle-propfirm-dot');
+  if(!track||!dot) return;
+  const on = isPropFirmMode();
+  track.style.background = on ? 'var(--accent-dim)' : 'var(--bg4)';
+  track.style.borderColor = on ? 'var(--accent)' : 'var(--border)';
+  dot.style.background    = on ? 'var(--accent)' : 'var(--t3)';
+  dot.style.left          = on ? '19px' : '3px';
+  // Show/hide config panel
+  const cfg = document.getElementById('propfirm-config');
+  if(cfg) cfg.style.display = on ? 'block' : 'none';
+  // Fill saved values
+  if(on && state.propFirmConfig){
+    const c = state.propFirmConfig;
+    const f = (id,v) => { const el=document.getElementById(id); if(el&&v) el.value=v; };
+    f('pf-account-size', c.accountSize);
+    f('pf-profit-target', c.profitTarget);
+    f('pf-daily-loss', c.dailyLoss);
+    f('pf-max-loss', c.maxLoss);
+    updatePropFirmIndicators();
+  }
+}
+
+function savePropFirmConfig(){
+  const g = id => parseFloat(document.getElementById(id)?.value)||0;
+  state.propFirmConfig = {
+    accountSize: g('pf-account-size'),
+    profitTarget: g('pf-profit-target'),
+    dailyLoss: g('pf-daily-loss'),
+    maxLoss: g('pf-max-loss')
+  };
+  // Update PROP_RULES with new values
+  if(state.propFirmConfig.maxLoss) PROP_RULES.maxDD = state.propFirmConfig.maxLoss;
+  saveState();
+  updatePropFirmIndicators();
+  renderAll();
+}
+
+function updatePropFirmIndicators(){
+  const el = document.getElementById('pf-indicators');
+  if(!el) return;
+  const c = state.propFirmConfig;
+  if(!c || !c.accountSize) { el.innerHTML=''; return; }
+  const trades = getCurrentTrades();
+  const pnl = trades.reduce((s,t)=>s+t.pnl,0);
+  const pnlPct = (pnl/c.accountSize*100);
+  const stats = calcStats(trades);
+  const dd = stats ? stats.maxDD : 0;
+
+  const targetAmt = c.accountSize * c.profitTarget/100;
+  const dailyLossAmt = c.accountSize * c.dailyLoss/100;
+  const maxLossAmt = c.accountSize * c.maxLoss/100;
+
+  const pnlPctOfTarget = c.profitTarget ? Math.min(100, Math.max(0, pnlPct/c.profitTarget*100)) : 0;
+  const ddPctOfLimit   = c.maxLoss ? Math.min(100, dd/c.maxLoss*100) : 0;
+
+  const ind = (label, val, pct, color, isRisk) => {
+    const barColor = isRisk ? (pct>80?'var(--red)':pct>50?'var(--gold)':'var(--accent)') : 'var(--accent)';
+    return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px">
+      <div style="font-family:var(--fm);font-size:7px;color:var(--t2);letter-spacing:1px;margin-bottom:4px">${label}</div>
+      <div style="font-family:var(--fm);font-size:11px;color:${color};font-weight:700;margin-bottom:5px">${val}</div>
+      <div style="height:3px;background:var(--bg3);border-radius:2px">
+        <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px;transition:width 0.3s"></div>
+      </div>
+    </div>`;
+  };
+
+  el.innerHTML =
+    ind('PROFIT', (pnl>=0?'+':'')+pnl.toFixed(0)+'$ / '+targetAmt.toFixed(0)+'$', pnlPctOfTarget, pnl>=0?'var(--accent)':'var(--red)', false) +
+    ind('DRAWDOWN', dd.toFixed(1)+'% / '+c.maxLoss+'%', ddPctOfLimit, dd>c.maxLoss?'var(--red)':dd>c.maxLoss*0.8?'var(--gold)':'var(--t1)', true) +
+    ind('PERTE JOUR MAX', dailyLossAmt.toFixed(0)+'$', 0, 'var(--t2)', false) +
+    ind('TAILLE COMPTE', c.accountSize.toLocaleString()+'$', 0, 'var(--t2)', false);
 }
 init();
 </script>
