@@ -9,15 +9,48 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+/* ── THEMES ─────────────────────────────── */
 :root{
-  --bg0:#111111;--bg1:#1a1a1a;--bg2:#222222;--bg3:#2a2a2a;--bg4:#333333;
-  --accent:#00e676;--accent-dim:rgba(0,230,118,0.14);--accent-glow:rgba(0,230,118,0.45);
-  --red:#ff4757;--red-dim:rgba(255,71,87,0.14);
-  --gold:#ffd32a;--blue:#4a9eff;--purple:#b47fff;--orange:#ff7043;--cyan:#18e4c8;--pink:#ff6b9d;
-  --t1:#f0f0f0;--t2:#b0b0b0;--t3:#666666;
-  --border:rgba(255,255,255,0.09);--border-accent:rgba(0,230,118,0.3);
+  --bg0:#131722;--bg1:#1c2030;--bg2:#1e2436;--bg3:#252d42;--bg4:#2a3350;
+  --accent:#26a69a;--accent-dim:rgba(38,166,154,0.14);--accent-glow:rgba(38,166,154,0.45);
+  --red:#ef5350;--red-dim:rgba(239,83,80,0.14);
+  --gold:#ffd32a;--blue:#4a9eff;--purple:#b47fff;--orange:#ff7043;--cyan:#18e4c8;--pink:#ec4899;
+  --t1:#d1d4dc;--t2:#787b86;--t3:#434651;
+  --border:rgba(255,255,255,0.07);--border-accent:rgba(38,166,154,0.3);
   --fm:'JetBrains Mono','Courier New',monospace;
   --fd:'Rajdhani','Segoe UI',sans-serif;
+}
+/* TradingView (default) */
+html[data-theme="tradingview"]{
+  --bg0:#131722;--bg1:#1c2030;--bg2:#1e2436;--bg3:#252d42;--bg4:#2a3350;
+  --accent:#26a69a;--accent-dim:rgba(38,166,154,0.14);--accent-glow:rgba(38,166,154,0.4);
+  --red:#ef5350;--red-dim:rgba(239,83,80,0.14);
+  --t1:#d1d4dc;--t2:#787b86;--t3:#434651;
+  --border:rgba(255,255,255,0.07);--border-accent:rgba(38,166,154,0.3);
+}
+/* Terminal */
+html[data-theme="terminal"]{
+  --bg0:#000000;--bg1:#080808;--bg2:#0d0d0d;--bg3:#121212;--bg4:#181818;
+  --accent:#00ff41;--accent-dim:rgba(0,255,65,0.1);--accent-glow:rgba(0,255,65,0.5);
+  --red:#ff3131;--red-dim:rgba(255,49,49,0.12);
+  --t1:#00ff41;--t2:#00cc33;--t3:#007a1f;
+  --border:rgba(0,255,65,0.12);--border-accent:rgba(0,255,65,0.35);
+}
+/* Obsidian */
+html[data-theme="obsidian"]{
+  --bg0:#0f0d14;--bg1:#13101c;--bg2:#181423;--bg3:#1e1929;--bg4:#241f30;
+  --accent:#f5c542;--accent-dim:rgba(245,197,66,0.12);--accent-glow:rgba(245,197,66,0.4);
+  --red:#f87171;--red-dim:rgba(248,113,113,0.14);
+  --t1:#f0e6d0;--t2:#8b7355;--t3:#4a3d2a;
+  --border:rgba(245,197,66,0.08);--border-accent:rgba(245,197,66,0.25);
+}
+/* Navy */
+html[data-theme="navy"]{
+  --bg0:#080d1a;--bg1:#0d1428;--bg2:#111c35;--bg3:#162240;--bg4:#1a284a;
+  --accent:#00d4ff;--accent-dim:rgba(0,212,255,0.12);--accent-glow:rgba(0,212,255,0.45);
+  --red:#ff6b6b;--red-dim:rgba(255,107,107,0.14);
+  --t1:#e0f0ff;--t2:#4a7fa5;--t3:#2a4a6a;
+  --border:rgba(0,212,255,0.08);--border-accent:rgba(0,212,255,0.25);
 }
 body{font-family:var(--fd);background:var(--bg0);color:var(--t1);min-height:100vh;overflow-x:hidden}
 input,button,select,textarea{font-family:var(--fd)}
@@ -35,7 +68,7 @@ button{cursor:pointer}
 .logo-text{font-size:18px;font-weight:700;letter-spacing:3px;color:var(--accent);text-shadow:0 0 20px var(--accent-glow)}
 .logo-sub{font-family:var(--fm);font-size:9px;color:var(--t3);letter-spacing:2px;margin-top:2px}
 .sidebar-section{padding:8px 10px}
-.sidebar-label{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:2px;text-transform:uppercase;padding:6px 4px 8px}
+.sidebar-label{font-family:var(--fm);font-size:8px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;padding:6px 4px 8px;font-weight:600}
 .account-item{padding:10px 12px;border-radius:10px;cursor:pointer;margin-bottom:4px;border:1px solid transparent;transition:all 0.2s}
 .account-item:hover{background:rgba(255,255,255,0.04)}
 .account-item.active{border-color:var(--item-color,var(--accent));background:color-mix(in srgb,var(--item-color,var(--accent)) 8%,transparent)}
@@ -64,11 +97,11 @@ button{cursor:pointer}
 /* PANELS */
 .panel{background:var(--bg1);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px}
 .panel-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10}
-.panel-title{flex:1;font-family:var(--fm);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--t2)}
+.panel-title{flex:1;font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--t1)}
 
 /* DIVIDER */
 .divider{display:flex;align-items:center;gap:10;margin:16px 0 12px}
-.divider span{font-family:var(--fm);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--t3);white-space:nowrap}
+.divider span{font-family:var(--fm);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--t1);white-space:nowrap;font-weight:600}
 .divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
 /* KPI CARDS */
@@ -285,14 +318,20 @@ button{cursor:pointer}
         <button class="settings-btn" onclick="showSettingsMenu()" title="Paramètres">⚙</button>
 
 <div id="settings-menu" style="display:none;position:fixed;top:58px;right:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:8px;z-index:200;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
-  <div style="font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:2px;padding:6px 10px 8px">PARAMÈTRES</div>
-  <button onclick="showApiKeyModal();closeSettingsMenu()" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--t2);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px;display:flex;gap:10px;align-items:center" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">🔑 Clé API Claude</button>
-  <button onclick="window.open('https://forms.gle/feedback','_blank');closeSettingsMenu()" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--t2);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px;display:flex;gap:10px;align-items:center" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">💬 Donner mon avis (beta)</button>
+  <div style="font-family:var(--fm);font-size:8px;color:var(--t1);letter-spacing:2px;padding:6px 10px 8px;font-weight:600">PARAMÈTRES</div>
+  <button onclick="showApiKeyModal();closeSettingsMenu()" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--t1);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px;display:flex;gap:10px;align-items:center" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">🔑 Clé API Claude</button>
+  <button onclick="window.open('https://forms.gle/feedback','_blank');closeSettingsMenu()" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--t1);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px;display:flex;gap:10px;align-items:center" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">💬 Donner mon avis (beta)</button>
   <div style="height:1px;background:var(--border);margin:4px 0"></div>
-  <button onclick="showOnboardingAgain();closeSettingsMenu()" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--t2);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">📖 Revoir le tutoriel</button>
+  <div style="font-family:var(--fm);font-size:8px;color:var(--t1);letter-spacing:2px;padding:6px 10px 6px;font-weight:600">🎨 THÈME</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:0 4px 8px">
+    <button id="theme-btn-tradingview" onclick="applyTheme('tradingview');closeSettingsMenu()" style="padding:8px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-family:var(--fm);font-size:9px;cursor:pointer;transition:all 0.15s;text-align:center">TradingView</button>
+    <button id="theme-btn-terminal"    onclick="applyTheme('terminal');closeSettingsMenu()"    style="padding:8px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-family:var(--fm);font-size:9px;cursor:pointer;transition:all 0.15s;text-align:center">Terminal</button>
+    <button id="theme-btn-obsidian"    onclick="applyTheme('obsidian');closeSettingsMenu()"    style="padding:8px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-family:var(--fm);font-size:9px;cursor:pointer;transition:all 0.15s;text-align:center">Obsidian</button>
+    <button id="theme-btn-navy"        onclick="applyTheme('navy');closeSettingsMenu()"        style="padding:8px 6px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--t2);font-family:var(--fm);font-size:9px;cursor:pointer;transition:all 0.15s;text-align:center">Navy</button>
+  </div>
+  <div style="height:1px;background:var(--border);margin:4px 0"></div>
+  <button onclick="showOnboardingAgain();closeSettingsMenu()" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--t1);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">📖 Revoir le tutoriel</button>
   <button onclick="if(confirm('Supprimer toutes les données ?')){localStorage.clear();location.reload()}" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--red);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px" onmouseover="this.style.background='var(--red-dim)'" onmouseout="this.style.background='transparent'">🗑 Réinitialiser tout</button>
-  <div style="height:1px;background:var(--border);margin:4px 0"></div>
-  <button onclick="localStorage.removeItem('edge_beta_access');window.location.href='index.html'" style="width:100%;padding:9px 12px;background:transparent;border:none;color:var(--t3);font-family:var(--fm);font-size:11px;text-align:left;cursor:pointer;border-radius:7px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">🚪 Se déconnecter</button>
   <div style="font-family:var(--fm);font-size:7px;color:var(--t3);text-align:center;padding:6px 0 2px">v0.5.0 BETA</div>
 </div>
       </div>
@@ -1529,11 +1568,6 @@ function showImportError(error, filename){
   setTimeout(()=>toast.remove(), 5000);
 }
 
-// ── BETA GUARD ─────────────────────────────────────────────────
-if(localStorage.getItem('edge_beta_access') !== 'BETA01') {
-  window.location.href = 'index.html';
-}
-
 window.addEventListener('resize', ()=>{renderTopbar();renderSidebar();});
 document.addEventListener('click', e=>{
   const menu=document.getElementById('settings-menu');
@@ -1547,6 +1581,44 @@ function closeSettingsMenu(){
   const m=document.getElementById('settings-menu');
   if(m)m.style.display='none';
 }
+
+// ── THEME ENGINE ─────────────────────────────────────────────────
+const THEMES={
+  tradingview:{bg0:'#131722',bg1:'#1c2030',bg2:'#1e2436',bg3:'#252d42',bg4:'#2a3350',accent:'#26a69a',accentDim:'rgba(38,166,154,0.14)',accentGlow:'rgba(38,166,154,0.4)',red:'#ef5350',redDim:'rgba(239,83,80,0.14)',t1:'#d1d4dc',t2:'#787b86',t3:'#434651',border:'rgba(255,255,255,0.07)',borderAccent:'rgba(38,166,154,0.3)'},
+  terminal:   {bg0:'#000000',bg1:'#080808',bg2:'#0d0d0d',bg3:'#121212',bg4:'#181818',accent:'#00ff41',accentDim:'rgba(0,255,65,0.1)',accentGlow:'rgba(0,255,65,0.5)',red:'#ff3131',redDim:'rgba(255,49,49,0.12)',t1:'#00ff41',t2:'#00cc33',t3:'#007a1f',border:'rgba(0,255,65,0.12)',borderAccent:'rgba(0,255,65,0.35)'},
+  obsidian:   {bg0:'#0f0d14',bg1:'#13101c',bg2:'#181423',bg3:'#1e1929',bg4:'#241f30',accent:'#f5c542',accentDim:'rgba(245,197,66,0.12)',accentGlow:'rgba(245,197,66,0.4)',red:'#f87171',redDim:'rgba(248,113,113,0.14)',t1:'#f0e6d0',t2:'#8b7355',t3:'#4a3d2a',border:'rgba(245,197,66,0.08)',borderAccent:'rgba(245,197,66,0.25)'},
+  navy:       {bg0:'#080d1a',bg1:'#0d1428',bg2:'#111c35',bg3:'#162240',bg4:'#1a284a',accent:'#00d4ff',accentDim:'rgba(0,212,255,0.12)',accentGlow:'rgba(0,212,255,0.45)',red:'#ff6b6b',redDim:'rgba(255,107,107,0.14)',t1:'#e0f0ff',t2:'#4a7fa5',t3:'#2a4a6a',border:'rgba(0,212,255,0.08)',borderAccent:'rgba(0,212,255,0.25)'}
+};
+const THEME_ACCENTS={tradingview:'#26a69a',terminal:'#00ff41',obsidian:'#f5c542',navy:'#00d4ff'};
+
+function applyTheme(name){
+  const t=THEMES[name]; if(!t) return;
+  const r=document.documentElement;
+  r.setAttribute('data-theme',name);
+  r.style.setProperty('--bg0',t.bg0); r.style.setProperty('--bg1',t.bg1);
+  r.style.setProperty('--bg2',t.bg2); r.style.setProperty('--bg3',t.bg3); r.style.setProperty('--bg4',t.bg4);
+  r.style.setProperty('--accent',t.accent); r.style.setProperty('--accent-dim',t.accentDim); r.style.setProperty('--accent-glow',t.accentGlow);
+  r.style.setProperty('--red',t.red); r.style.setProperty('--red-dim',t.redDim);
+  r.style.setProperty('--t1',t.t1); r.style.setProperty('--t2',t.t2); r.style.setProperty('--t3',t.t3);
+  r.style.setProperty('--border',t.border); r.style.setProperty('--border-accent',t.borderAccent);
+  localStorage.setItem('edge_theme',name);
+  // Highlight active button
+  Object.keys(THEMES).forEach(n=>{
+    const btn=document.getElementById('theme-btn-'+n);
+    if(!btn) return;
+    const active=n===name;
+    btn.style.background=active?(THEME_ACCENTS[n]+'22'):'var(--bg3)';
+    btn.style.borderColor=active?(THEME_ACCENTS[n]+'66'):'var(--border)';
+    btn.style.color=active?THEME_ACCENTS[n]:'var(--t2)';
+    btn.style.fontWeight=active?'700':'400';
+  });
+  // Redraw charts
+  Object.keys(state.charts).forEach(id=>destroyChart(id));
+  renderContent();
+}
+
+// Apply saved theme on load
+(function(){ applyTheme(localStorage.getItem('edge_theme')||'tradingview'); })();
 function showOnboardingAgain(){
   showOnboarding();
 }
