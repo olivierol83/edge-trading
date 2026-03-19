@@ -175,10 +175,22 @@ button{cursor:pointer}
 
 /* AI PANEL */
 .ai-panel{background:var(--bg1);border:1px solid var(--border-accent);border-radius:14px;overflow:hidden;margin-bottom:16px;box-shadow:0 0 30px rgba(0,255,136,0.04)}
+.setup-panel{background:var(--bg1);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.setup-drop{border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative}
+.setup-drop:hover,.setup-drop.dragover{border-color:var(--accent);background:var(--accent-dim)}
+.setup-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.score-ring{width:64px;height:64px;flex-shrink:0}
+.setup-result{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:12px}
+.setup-tag{display:inline-block;padding:3px 10px;border-radius:20px;font-family:var(--fm);font-size:9px;font-weight:700;letter-spacing:1px;margin-right:4px;margin-bottom:4px}
+.setup-tag.bull{background:rgba(38,166,154,0.15);color:var(--accent);border:1px solid var(--accent)}
+.setup-tag.bear{background:var(--red-dim);color:var(--red);border:1px solid var(--red)}
+.setup-tag.neutral{background:var(--bg3);color:var(--t2);border:1px solid var(--border)}
+.setup-section{margin-bottom:12px}
+.setup-section-title{font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:2px;margin-bottom:6px;text-transform:uppercase}
 .ai-header{padding:12px 16px;border-bottom:1px solid var(--border-accent);display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(0,255,136,0.08),transparent)}
 .ai-icon{width:30px;height:30px;border-radius:8px;background:var(--accent-dim);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .ai-title{font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:2px;color:var(--accent);text-transform:uppercase}
-.ai-sub{font-family:var(--fm);font-size:8px;color:var(--t3)}
+.ai-sub{font-family:var(--fm);font-size:8px;color:var(--t1)}
 .ai-body{padding:14px}
 .ai-quick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .btn-quick{padding:5px 11px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;color:var(--t2);font-family:var(--fm);font-size:9px;transition:all 0.2s}
@@ -1247,7 +1259,7 @@ function renderAIPanel(){
       <div class="ai-icon">🧠</div>
       <div>
         <div class="ai-title">CLAUDE — Coach Trading</div>
-        <div class="ai-sub">Sélectionne tes données → colle dans le chat Claude</div>
+        <div class="ai-sub" style="color:var(--t1)">Sélectionne tes données → colle dans le chat Claude</div>
       </div>
       <div style="margin-left:auto"><span class="badge badge-blue">VIA CHAT</span></div>
     </div>
@@ -1279,6 +1291,198 @@ function renderAIPanel(){
   </div>`;
 }
 
+
+function renderSetupPanel(){
+  return `<div class="setup-panel">
+    <div class="ai-header">
+      <div class="ai-icon">🔍</div>
+      <div>
+        <div class="ai-title">ANALYSE DE SETUP</div>
+        <div class="ai-sub" style="color:var(--t1)">Upload un chart · Confirme ou invalide ta prise de position</div>
+      </div>
+      <div style="margin-left:auto"><span class="badge ${state.apiKey?'badge-green':'badge-red'}">${state.apiKey?'API ACTIVE':'CLÉ API REQUISE'}</span></div>
+    </div>
+    <div class="ai-body">
+      ${!state.apiKey ? `
+        <div style="text-align:center;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">🔑</div>
+          <div style="font-family:var(--fm);font-size:11px;color:var(--t2);margin-bottom:14px">Configure ta clé API Claude pour activer l'analyse de charts</div>
+          <button onclick="showApiKeyModal()" class="btn-primary" style="padding:9px 20px;font-size:12px">Configurer la clé API</button>
+        </div>` : `
+      <div class="setup-drop" id="setup-drop" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleSetupDrop(event)">
+        <input type="file" accept="image/*" onchange="handleSetupFile(this.files[0])"/>
+        <div id="setup-preview-wrap">
+          <div style="font-size:28px;margin-bottom:8px">📊</div>
+          <div style="font-family:var(--fm);font-size:11px;color:var(--t2);margin-bottom:4px">Glisse ton screenshot de chart ici</div>
+          <div style="font-family:var(--fm);font-size:9px;color:var(--t3)">ou clique pour sélectionner · TradingView, MT5, tout format</div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-family:var(--fm);font-size:8px;color:var(--t2);letter-spacing:1px;margin-bottom:6px">CONTEXTE (optionnel)</div>
+        <textarea id="setup-context" placeholder="Ex: Potentiel breakout résistance 4H, tendance haussière daily, attente retest..." style="width:100%;height:70px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--t1);font-family:var(--fm);font-size:10px;outline:none;resize:none;box-sizing:border-box;line-height:1.6"></textarea>
+      </div>
+      <button id="setup-analyze-btn" onclick="analyzeSetup()" style="width:100%;margin-top:10px;padding:12px;background:var(--accent);color:var(--bg0);border:none;border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all 0.2s;opacity:0.4" disabled>
+        🔍 ANALYSER LE SETUP
+      </button>
+      <div id="setup-result" style="display:none"></div>`}
+    </div>
+  </div>`;
+}
+
+let setupImageBase64 = null;
+
+function handleSetupDrop(e){
+  e.preventDefault();
+  document.getElementById('setup-drop').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if(file && file.type.startsWith('image/')) handleSetupFile(file);
+}
+
+function handleSetupFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    setupImageBase64 = e.target.result.split(',')[1];
+    const wrap = document.getElementById('setup-preview-wrap');
+    if(wrap){
+      wrap.innerHTML = `<img src="${e.target.result}" style="max-height:180px;max-width:100%;border-radius:8px;object-fit:contain"/>
+        <div style="font-family:var(--fm);font-size:9px;color:var(--accent);margin-top:8px">✓ ${file.name}</div>`;
+    }
+    const btn = document.getElementById('setup-analyze-btn');
+    if(btn){ btn.disabled=false; btn.style.opacity='1'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzeSetup(){
+  if(!setupImageBase64){ alert('Upload un chart d\'abord.'); return; }
+  if(!state.apiKey){ showApiKeyModal(); return; }
+
+  const btn = document.getElementById('setup-analyze-btn');
+  const resultEl = document.getElementById('setup-result');
+  btn.textContent = '⏳ Analyse en cours...';
+  btn.disabled = true;
+  resultEl.style.display = 'none';
+
+  // Build context from user stats
+  const trades = getCurrentTrades();
+  const stats = trades.length ? calcStats(trades) : null;
+  const ctx = document.getElementById('setup-context')?.value?.trim() || '';
+  const account = state.consolidated ? 'Consolidé' : (getActiveAccount()?.name||'');
+
+  const statsCtx = stats ? `
+Données trader (${account}) :
+- Win Rate: ${stats.winRate.toFixed(1)}% | R:R moyen: ${stats.rr.toFixed(2)} | PF: ${stats.pf.toFixed(2)}
+- Meilleur trade: +$${stats.best?.pnl?.toFixed(2)||0}
+- Max Drawdown: ${stats.maxDD.toFixed(1)}%` : '';
+
+  const prompt = `Tu es un analyste de trading expert. Analyse ce screenshot de chart et fournis une analyse structurée en JSON uniquement, sans markdown ni backticks.
+
+${ctx ? 'Contexte du trader: '+ctx : ''}
+${statsCtx}
+
+Réponds UNIQUEMENT avec ce JSON (pas de texte avant ou après) :
+{
+  "verdict": "LONG" ou "SHORT" ou "NEUTRE" ou "ATTENDRE",
+  "score": nombre entre 0 et 100 (score de confiance),
+  "resume": "une phrase de verdict clair",
+  "niveaux": {
+    "support": "niveau ou zone identifiée",
+    "resistance": "niveau ou zone identifiée",
+    "objectif": "target si setup valide",
+    "invalidation": "niveau qui invalide le setup"
+  },
+  "confirmations": ["signal 1", "signal 2"],
+  "risques": ["risque 1", "risque 2"],
+  "conseil": "recommandation concrète en 1-2 phrases"
+}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':state.apiKey,'anthropic-version':'2023-06-01'},
+      body: JSON.stringify({
+        model:'claude-opus-4-5',
+        max_tokens:1000,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:'image/png',data:setupImageBase64}},
+          {type:'text',text:prompt}
+        ]}]
+      })
+    });
+    const data = await resp.json();
+    if(data.error) throw new Error(data.error.message);
+    const raw = data.content[0].text.trim().replace(/```json|```/g,'').trim();
+    const result = JSON.parse(raw);
+    displaySetupResult(result);
+  } catch(err){
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `<div style="background:var(--red-dim);border:1px solid var(--red);border-radius:10px;padding:14px;font-family:var(--fm);font-size:11px;color:var(--red)">⚠ Erreur : ${err.message}</div>`;
+  }
+  btn.textContent = '🔍 ANALYSER LE SETUP';
+  btn.disabled = false;
+  btn.style.opacity = '1';
+}
+
+function displaySetupResult(r){
+  const resultEl = document.getElementById('setup-result');
+  if(!resultEl) return;
+
+  const verdictColor = {LONG:'var(--accent)',SHORT:'var(--red)',NEUTRE:'var(--gold)',ATTENDRE:'var(--t2)'}[r.verdict]||'var(--t2)';
+  const verdictEmoji = {LONG:'📈',SHORT:'📉',NEUTRE:'↔️',ATTENDRE:'⏸'}[r.verdict]||'❓';
+  const scoreColor = r.score>=70?'var(--accent)':r.score>=50?'var(--gold)':'var(--red)';
+  const circumference = 2*Math.PI*26;
+  const dashOffset = circumference*(1-r.score/100);
+
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `
+    <div class="setup-result">
+      <!-- Header verdict + score -->
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+        <svg class="score-ring" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border)" stroke-width="5"/>
+          <circle cx="32" cy="32" r="26" fill="none" stroke="${scoreColor}" stroke-width="5"
+            stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}"
+            stroke-linecap="round" transform="rotate(-90 32 32)" style="transition:stroke-dashoffset 0.8s"/>
+          <text x="32" y="37" text-anchor="middle" fill="${scoreColor}" font-size="13" font-weight="700" font-family="JetBrains Mono,monospace">${r.score}%</text>
+        </svg>
+        <div>
+          <div style="font-size:22px;font-weight:800;color:${verdictColor};letter-spacing:2px">${verdictEmoji} ${r.verdict}</div>
+          <div style="font-family:var(--fm);font-size:10px;color:var(--t2);margin-top:3px;line-height:1.5">${r.resume}</div>
+        </div>
+      </div>
+
+      <!-- Niveaux clés -->
+      <div class="setup-section">
+        <div class="setup-section-title">📍 Niveaux clés</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          ${[['Support',r.niveaux?.support,'var(--accent)'],['Résistance',r.niveaux?.resistance,'var(--red)'],['Objectif',r.niveaux?.objectif,'var(--accent)'],['Invalidation',r.niveaux?.invalidation,'var(--red)']].map(([k,v,c])=>`
+          <div style="background:var(--bg3);border-radius:7px;padding:8px 10px">
+            <div style="font-family:var(--fm);font-size:7px;color:var(--t3);letter-spacing:1px;margin-bottom:3px">${k.toUpperCase()}</div>
+            <div style="font-family:var(--fm);font-size:11px;color:${c};font-weight:600">${v||'—'}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Confirmations -->
+      <div class="setup-section">
+        <div class="setup-section-title">✅ Confirmations</div>
+        <div>${(r.confirmations||[]).map(c=>`<span class="setup-tag bull">✓ ${c}</span>`).join('')}</div>
+      </div>
+
+      <!-- Risques -->
+      <div class="setup-section">
+        <div class="setup-section-title">⚠️ Risques</div>
+        <div>${(r.risques||[]).map(c=>`<span class="setup-tag bear">⚠ ${c}</span>`).join('')}</div>
+      </div>
+
+      <!-- Conseil -->
+      <div style="background:var(--accent-dim);border:1px solid var(--border-accent);border-radius:8px;padding:10px 12px">
+        <div style="font-family:var(--fm);font-size:8px;color:var(--accent);letter-spacing:2px;margin-bottom:5px">RECOMMANDATION</div>
+        <div style="font-family:var(--fm);font-size:11px;color:var(--t1);line-height:1.6">${r.conseil}</div>
+      </div>
+    </div>`;
+}
 
 function renderTable(trades, color){
   return `<div class="panel">
@@ -1345,6 +1549,8 @@ function renderDashboard(trades, allTrades, accountName, color){
     html+=`<div id="cal-container">${renderCalendar(allTrades)}</div>`;
     html+=`<div class="divider"><span>Analyse IA</span></div>`;
     html+=renderAIPanel();
+    html+=`<div class="divider"><span>Analyse de Setup</span></div>`;
+    html+=renderSetupPanel();
     html+=`<div class="divider"><span>Historique des trades</span></div>`;
     html+=renderTable(filtered,color);
   }
@@ -1393,6 +1599,8 @@ function renderConsolidated(){
     html+=renderKPIs(stats,color);
     html+=`<div class="divider"><span>Analyse IA</span></div>`;
     html+=renderAIPanel();
+    html+=`<div class="divider"><span>Analyse de Setup</span></div>`;
+    html+=renderSetupPanel();
   }
   return html;
 }
