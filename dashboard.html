@@ -15,7 +15,7 @@
   --accent:#26a69a;--accent-dim:rgba(38,166,154,0.14);--accent-glow:rgba(38,166,154,0.45);
   --red:#ef5350;--red-dim:rgba(239,83,80,0.14);
   --gold:#ffd32a;--blue:#4a9eff;--purple:#b47fff;--orange:#ff7043;--cyan:#18e4c8;--pink:#ec4899;
-  --t1:#d1d4dc;--t2:#787b86;--t3:#434651;
+  --t1:#ffffff;--t2:#c8ccd4;--t3:#9499a3;
   --border:rgba(255,255,255,0.07);--border-accent:rgba(38,166,154,0.3);
   --fm:'JetBrains Mono','Courier New',monospace;
   --fd:'Rajdhani','Segoe UI',sans-serif;
@@ -25,7 +25,7 @@ html[data-theme="tradingview"]{
   --bg0:#131722;--bg1:#1c2030;--bg2:#1e2436;--bg3:#252d42;--bg4:#2a3350;
   --accent:#26a69a;--accent-dim:rgba(38,166,154,0.14);--accent-glow:rgba(38,166,154,0.4);
   --red:#ef5350;--red-dim:rgba(239,83,80,0.14);
-  --t1:#d1d4dc;--t2:#787b86;--t3:#434651;
+  --t1:#ffffff;--t2:#c8ccd4;--t3:#9499a3;
   --border:rgba(255,255,255,0.07);--border-accent:rgba(38,166,154,0.3);
 }
 /* Terminal */
@@ -33,7 +33,7 @@ html[data-theme="terminal"]{
   --bg0:#000000;--bg1:#080808;--bg2:#0d0d0d;--bg3:#121212;--bg4:#181818;
   --accent:#00ff41;--accent-dim:rgba(0,255,65,0.1);--accent-glow:rgba(0,255,65,0.5);
   --red:#ff3131;--red-dim:rgba(255,49,49,0.12);
-  --t1:#00ff41;--t2:#00cc33;--t3:#007a1f;
+  --t1:#00ff41;--t2:#c8ffd4;--t3:#80e898;
   --border:rgba(0,255,65,0.12);--border-accent:rgba(0,255,65,0.35);
 }
 /* Obsidian */
@@ -41,7 +41,7 @@ html[data-theme="obsidian"]{
   --bg0:#0f0d14;--bg1:#13101c;--bg2:#181423;--bg3:#1e1929;--bg4:#241f30;
   --accent:#f5c542;--accent-dim:rgba(245,197,66,0.12);--accent-glow:rgba(245,197,66,0.4);
   --red:#f87171;--red-dim:rgba(248,113,113,0.14);
-  --t1:#f0e6d0;--t2:#8b7355;--t3:#4a3d2a;
+  --t1:#ffffff;--t2:#e8d9bb;--t3:#c0a87a;
   --border:rgba(245,197,66,0.08);--border-accent:rgba(245,197,66,0.25);
 }
 /* Navy */
@@ -49,7 +49,7 @@ html[data-theme="navy"]{
   --bg0:#080d1a;--bg1:#0d1428;--bg2:#111c35;--bg3:#162240;--bg4:#1a284a;
   --accent:#00d4ff;--accent-dim:rgba(0,212,255,0.12);--accent-glow:rgba(0,212,255,0.45);
   --red:#ff6b6b;--red-dim:rgba(255,107,107,0.14);
-  --t1:#e0f0ff;--t2:#4a7fa5;--t3:#2a4a6a;
+  --t1:#ffffff;--t2:#d0e8f8;--t3:#a0c4e0;
   --border:rgba(0,212,255,0.08);--border-accent:rgba(0,212,255,0.25);
 }
 body{font-family:var(--fd);background:var(--bg0);color:var(--t1);min-height:100vh;overflow-x:hidden}
@@ -413,18 +413,57 @@ button{cursor:pointer}
 
 <!-- API KEY MODAL -->
 <div id="api-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this&&apiKeySaved)this.style.display='none'">
-  <div class="modal-box">
-    <div class="modal-title">🔑 Clé API Anthropic</div>
-    <div class="modal-desc">Pour utiliser l'analyse IA Claude, entrez votre clé API Anthropic. Elle est sauvegardée localement dans votre navigateur et n'est jamais envoyée ailleurs.</div>
-    <input id="api-key-input" class="modal-input" type="password" placeholder="sk-ant-api03-..." />
-    <div class="modal-hint">
-      Obtenez votre clé sur <a href="https://console.anthropic.com/api-keys" target="_blank">console.anthropic.com/api-keys</a><br>
-      ✓ Stockée uniquement dans ce navigateur (localStorage)<br>
-      ✓ Jamais transmise à des tiers
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-title">🔑 Clé API Claude</div>
+    <div class="modal-desc">La clé API permet d'activer le <strong>Coach Trading</strong> et l'<strong>Analyse de Setup</strong> directement dans EDGE.</div>
+
+    <!-- TUTO STEPS -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-family:var(--fm);font-size:8px;color:var(--accent);letter-spacing:2px;margin-bottom:12px;font-weight:600">COMMENT OBTENIR TA CLÉ (2 minutes)</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;color:var(--accent);flex-shrink:0;font-weight:700">1</div>
+          <div>
+            <div style="font-size:12px;color:var(--t1);font-weight:600;margin-bottom:2px">Crée un compte Anthropic</div>
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t1);line-height:1.6">Va sur <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a> → Sign up avec ton email<br>✓ <span style="color:var(--accent)">$5 de crédit offert</span> à l'inscription — largement suffisant pour tester</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;color:var(--accent);flex-shrink:0;font-weight:700">2</div>
+          <div>
+            <div style="font-size:12px;color:var(--t1);font-weight:600;margin-bottom:2px">Génère une clé API</div>
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t1);line-height:1.6">Dans la console → menu <strong style="color:var(--t1)">API Keys</strong> → bouton <strong style="color:var(--t1)">Create Key</strong><br>Donne-lui un nom (ex: "EDGE") et copie la clé générée</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;color:var(--accent);flex-shrink:0;font-weight:700">3</div>
+          <div>
+            <div style="font-size:12px;color:var(--t1);font-weight:600;margin-bottom:2px">Colle la clé ci-dessous</div>
+            <div style="font-family:var(--fm);font-size:9px;color:var(--t1);line-height:1.6">La clé commence par <span style="color:var(--t1);background:var(--bg3);padding:1px 6px;border-radius:4px">sk-ant-...</span><br>Elle est sauvegardée <strong style="color:var(--t1)">uniquement dans ton navigateur</strong> — jamais transmise</div>
+          </div>
+        </div>
+
+        <a href="https://console.anthropic.com/api-keys" target="_blank"
+          style="display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;background:var(--accent-dim);border:1px solid var(--border-accent);border-radius:8px;color:var(--accent);font-family:var(--fm);font-size:10px;font-weight:700;letter-spacing:1px;text-decoration:none;margin-top:2px;transition:all 0.15s"
+          onmouseover="this.style.background='rgba(38,166,154,0.25)'" onmouseout="this.style.background='var(--accent-dim)'">
+          🔗 Ouvrir console.anthropic.com →
+        </a>
+      </div>
     </div>
+
+    <!-- INPUT -->
+    <div style="font-family:var(--fm);font-size:8px;color:var(--t1);letter-spacing:1px;margin-bottom:6px">TA CLÉ API</div>
+    <input id="api-key-input" class="modal-input" type="password" placeholder="sk-ant-api03-..." />
+    <div style="font-family:var(--fm);font-size:8px;color:var(--t1);margin-top:6px;margin-bottom:16px">
+      ✓ Stockée uniquement dans ce navigateur · ✓ Jamais envoyée à des tiers · ✓ Supprimable à tout moment
+    </div>
+
     <div class="btn-row">
-      <button class="btn-secondary" onclick="skipApiKey()">Passer</button>
-      <button class="btn-primary" onclick="saveApiKey()" style="flex:1">SAUVEGARDER</button>
+      <button class="btn-secondary" onclick="skipApiKey()">Plus tard</button>
+      <button class="btn-primary" onclick="saveApiKey()" style="flex:1">ACTIVER L'IA →</button>
     </div>
   </div>
 </div>
@@ -1825,10 +1864,10 @@ function closeSettingsMenu(){
 
 // ── THEME ENGINE ─────────────────────────────────────────────────
 const THEMES={
-  tradingview:{bg0:'#131722',bg1:'#1c2030',bg2:'#1e2436',bg3:'#252d42',bg4:'#2a3350',accent:'#26a69a',accentDim:'rgba(38,166,154,0.14)',accentGlow:'rgba(38,166,154,0.4)',red:'#ef5350',redDim:'rgba(239,83,80,0.14)',t1:'#d1d4dc',t2:'#787b86',t3:'#434651',border:'rgba(255,255,255,0.07)',borderAccent:'rgba(38,166,154,0.3)'},
-  terminal:   {bg0:'#000000',bg1:'#080808',bg2:'#0d0d0d',bg3:'#121212',bg4:'#181818',accent:'#00ff41',accentDim:'rgba(0,255,65,0.1)',accentGlow:'rgba(0,255,65,0.5)',red:'#ff3131',redDim:'rgba(255,49,49,0.12)',t1:'#00ff41',t2:'#00cc33',t3:'#007a1f',border:'rgba(0,255,65,0.12)',borderAccent:'rgba(0,255,65,0.35)'},
-  obsidian:   {bg0:'#0f0d14',bg1:'#13101c',bg2:'#181423',bg3:'#1e1929',bg4:'#241f30',accent:'#f5c542',accentDim:'rgba(245,197,66,0.12)',accentGlow:'rgba(245,197,66,0.4)',red:'#f87171',redDim:'rgba(248,113,113,0.14)',t1:'#f0e6d0',t2:'#8b7355',t3:'#4a3d2a',border:'rgba(245,197,66,0.08)',borderAccent:'rgba(245,197,66,0.25)'},
-  navy:       {bg0:'#080d1a',bg1:'#0d1428',bg2:'#111c35',bg3:'#162240',bg4:'#1a284a',accent:'#00d4ff',accentDim:'rgba(0,212,255,0.12)',accentGlow:'rgba(0,212,255,0.45)',red:'#ff6b6b',redDim:'rgba(255,107,107,0.14)',t1:'#e0f0ff',t2:'#4a7fa5',t3:'#2a4a6a',border:'rgba(0,212,255,0.08)',borderAccent:'rgba(0,212,255,0.25)'}
+  tradingview:{bg0:'#131722',bg1:'#1c2030',bg2:'#1e2436',bg3:'#252d42',bg4:'#2a3350',accent:'#26a69a',accentDim:'rgba(38,166,154,0.14)',accentGlow:'rgba(38,166,154,0.4)',red:'#ef5350',redDim:'rgba(239,83,80,0.14)',t1:'#ffffff',t2:'#c8ccd4',t3:'#9499a3',border:'rgba(255,255,255,0.07)',borderAccent:'rgba(38,166,154,0.3)'},
+  terminal:   {bg0:'#000000',bg1:'#080808',bg2:'#0d0d0d',bg3:'#121212',bg4:'#181818',accent:'#00ff41',accentDim:'rgba(0,255,65,0.1)',accentGlow:'rgba(0,255,65,0.5)',red:'#ff3131',redDim:'rgba(255,49,49,0.12)',t1:'#00ff41',t2:'#c8ffd4',t3:'#80e898',border:'rgba(0,255,65,0.12)',borderAccent:'rgba(0,255,65,0.35)'},
+  obsidian:   {bg0:'#0f0d14',bg1:'#13101c',bg2:'#181423',bg3:'#1e1929',bg4:'#241f30',accent:'#f5c542',accentDim:'rgba(245,197,66,0.12)',accentGlow:'rgba(245,197,66,0.4)',red:'#f87171',redDim:'rgba(248,113,113,0.14)',t1:'#ffffff',t2:'#e8d9bb',t3:'#c0a87a',border:'rgba(245,197,66,0.08)',borderAccent:'rgba(245,197,66,0.25)'},
+  navy:       {bg0:'#080d1a',bg1:'#0d1428',bg2:'#111c35',bg3:'#162240',bg4:'#1a284a',accent:'#00d4ff',accentDim:'rgba(0,212,255,0.12)',accentGlow:'rgba(0,212,255,0.45)',red:'#ff6b6b',redDim:'rgba(255,107,107,0.14)',t1:'#ffffff',t2:'#d0e8f8',t3:'#a0c4e0',border:'rgba(0,212,255,0.08)',borderAccent:'rgba(0,212,255,0.25)'}
 };
 const THEME_ACCENTS={tradingview:'#26a69a',terminal:'#00ff41',obsidian:'#f5c542',navy:'#00d4ff'};
 
