@@ -509,7 +509,7 @@ const DAYS_LONG = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Sam
 const SESSION_COLORS = ['#00ff88','rgba(59,130,246,0.85)','rgba(245,197,66,0.85)','rgba(255,59,92,0.7)'];
 const PROP_RULES = {maxDD:10};
 function isPropFirmMode(){ return !!state.propFirmMode; }
-const PERIODS = [{l:'7J',d:7},{l:'30J',d:30},{l:'3M',d:90},{l:'6M',d:180},{l:'1A',d:365},{l:'TOUT',d:0}];
+const PERIODS = [{l:'1J',d:1},{l:'7J',d:7},{l:'30J',d:30},{l:'3M',d:90},{l:'6M',d:180},{l:'1A',d:365},{l:'TOUT',d:0}];
 
 let state = {
   accounts: [],
@@ -614,6 +614,10 @@ function mergeTrades(existing,newT){
 
 function filterByPeriod(trades,days){
   if(!days) return trades;
+  if(days===1){
+    const today=new Date().toISOString().split('T')[0];
+    return trades.filter(t=>t.date===today);
+  }
   const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-days);
   const cut=cutoff.toISOString().split('T')[0];
   return trades.filter(t=>t.date>=cut);
@@ -1252,7 +1256,7 @@ function buildCoachContext(trades, accountName, question) {
     const d=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][new Date(t.date+'T12:00:00').getDay()];
     if(!bD[d])bD[d]={pnl:0,count:0};bD[d].pnl+=t.pnl;bD[d].count++;
   });
-  const periodLabel = ['7 derniers jours','30 derniers jours','3 derniers mois','6 derniers mois','12 derniers mois','Tout l\'historique'][[7,30,90,180,365,0].indexOf(state.period)] || 'Tout l\'historique';
+  const periodLabel = ['Aujourd\'hui','7 derniers jours','30 derniers jours','3 derniers mois','6 derniers mois','12 derniers mois','Tout l\'historique'][[1,7,30,90,180,365,0].indexOf(state.period)] || 'Tout l\'historique';
   return `📊 DONNÉES EDGE — ${accountName} [${periodLabel}]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 Trades: ${trades.length} | P&L: $${s.totalPnl.toFixed(2)} | WR: ${s.winRate.toFixed(1)}%
@@ -1305,7 +1309,7 @@ function renderAIPanel(){
     <div class="ai-body">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap">
         <span style="font-family:var(--fm);font-size:8px;color:var(--t1);letter-spacing:2px;font-weight:600">PÉRIODE :</span>
-        ${[{l:'7J',d:7},{l:'30J',d:30},{l:'3M',d:90},{l:'6M',d:180},{l:'1A',d:365},{l:'TOUT',d:0}].map(({l,d})=>`<button onclick="state.period=${d};document.querySelectorAll('.coach-period').forEach(b=>b.classList.remove('active'));this.classList.add('active');if(document.getElementById('coach-zone').style.display!=='none'){showCoachCtx(document.querySelector('.btn-coach.active:not(.coach-period)')?.id?.replace('coach-btn-','')|| 'full')}" class="btn-period coach-period ${state.period===d?'active':''}" style="--period-color:var(--accent)">${l}</button>`).join('')}
+        ${[{l:'1J',d:1},{l:'7J',d:7},{l:'30J',d:30},{l:'3M',d:90},{l:'6M',d:180},{l:'1A',d:365},{l:'TOUT',d:0}].map(({l,d})=>`<button onclick="state.period=${d};document.querySelectorAll('.coach-period').forEach(b=>b.classList.remove('active'));this.classList.add('active');if(document.getElementById('coach-zone').style.display!=='none'){showCoachCtx(document.querySelector('.btn-coach.active:not(.coach-period)')?.id?.replace('coach-btn-','')|| 'full')}" class="btn-period coach-period ${state.period===d?'active':''}" style="--period-color:var(--accent)">${l}</button>`).join('')}
         <span id="coach-period-count" style="font-family:var(--fm);font-size:8px;color:var(--t3)">${getCurrentTrades().length}T</span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
